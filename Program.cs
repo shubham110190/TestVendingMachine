@@ -6,78 +6,66 @@ using System.Threading.Tasks;
 
 namespace VendingMachineProject
 {
-
-    public class Coinis 
+   public class Product
     {
-        string coinType;
-        double coinAmmount;
-        double totalAmmount;
-
-      public Coinis(string CoinType, double CoinAmmount, double totalAmmount)
+        Dictionary<string, double> products;
+        public Product(Dictionary<string, double> products)
         {
-            this.coinType = CoinType;
-            this.coinAmmount = CoinAmmount;
-            this.totalAmmount = totalAmmount;
+            this.products = products;
         }
 
-        public bool ValidateCoins(string coinType)
+        public string GetProductInfo(string productName, double productPrice)
         {
-            if (string.IsNullOrEmpty(coinType))
+            Double productAmmount = 0;
+            var outString = string.Empty;
+            if (products.TryGetValue(productName.ToLower().Trim(), out productAmmount))
             {
-                return false;
+                if (productPrice <= productAmmount)
+                {
+                    outString= "Thank You";
+                }
+                else
+                {
+                    Console.WriteLine("Product Name : {0}, Product Price: {1}", productName, productPrice);
+
+                }
             }
-         
-            return true;
+            return outString;
         }
 
-        public bool ValidateCoinsAmmount(string coinType, double coinAmmount)
+        public string ResetProductVendingMachine(double CurrentAmmount)
         {
-            if (!string.IsNullOrEmpty(coinType) && coinAmmount==0.01)
-            {
-                return false;
-            }
-
-            return true;
+           return "Insert Coin and Current Ammount is "+ CurrentAmmount.ToString();
         }
 
-        public string InsertValidCoinAndUpdateAmmount(string coinType, double coinAmmount)
-        {
-            string finalAmmount = string.Empty;
-            if (!string.IsNullOrEmpty(coinType))
-            {
-                totalAmmount = totalAmmount + coinAmmount;
-                finalAmmount= "Updated Ammount= " + totalAmmount;
-            }
-            return finalAmmount;
-        }
     }
 
     class Program
     {
         static void Main(string[] args)
         {
-            double coinAmmount = 0.0;
             Console.WriteLine("Vending Machine is working");
-            Console.WriteLine("Enter Total Ammount");
-            double totalAmmount = Convert.ToDouble(Console.ReadLine());
-            Console.WriteLine("Enter Coin Type");
-            string coinType = Console.ReadLine();
-            Console.WriteLine("Enter Coin Ammount");
-            string coinAmmountStr = Console.ReadLine();
-            if (!string.IsNullOrEmpty(coinAmmountStr))
-            coinAmmount = Convert.ToDouble(coinAmmount);
-
-            Coinis objCoinis = new Coinis(coinType, coinAmmount, totalAmmount);
-            if (objCoinis.ValidateCoins(coinType))
-                Console.WriteLine("Please Insert Coin");
-            else if (objCoinis.ValidateCoinsAmmount(coinType, coinAmmount))
+            Dictionary<string, double> products = new Dictionary<string, double>();
+            products.Add("cola", 1.0);
+            products.Add("chips", 0.50);
+            products.Add("candy", 0.65);
+            Console.WriteLine("Enter Product");
+            var productName = Console.ReadLine();
+            Console.WriteLine("Insert Coin");
+            var productAmmount = Convert.ToDouble(Console.ReadLine());
+            Product objProduct = new Product(products);
+            var outMsg= objProduct.GetProductInfo(productName, productAmmount);
+            if (string.IsNullOrEmpty(outMsg))
             {
-                Console.WriteLine("Coins Rejected due to invalid ammount");
+                Console.WriteLine("Product Name : {0}, Product Price: {1}", productName, productAmmount);
+                Console.WriteLine(objProduct.ResetProductVendingMachine(productAmmount));
             }
-            else 
+            else
             {
-                Console.WriteLine(objCoinis.InsertValidCoinAndUpdateAmmount(coinType, coinAmmount));
+                Console.WriteLine(outMsg);
+                Console.WriteLine(objProduct.ResetProductVendingMachine(0.0));
             }
+            Console.ReadLine();
         }
     }
 }
